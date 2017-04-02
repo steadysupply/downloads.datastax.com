@@ -23,10 +23,12 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     zlib1g \
     gzip \
     python \
-    python-support \
     sysstat \
     ntp bash tree && \
     rm -rf /var/lib/apt/lists/*
+
+RUN wget http://launchpadlibrarian.net/109052632/python-support_1.0.15_all.deb
+RUN dpkg -i python-support_1.0.15_all.deb
 
 # grab gosu for easy step-down from root
 RUN curl -o /bin/gosu -SkL "https://github.com/tianon/gosu/releases/download/1.4/gosu-$(dpkg --print-architecture)" \
