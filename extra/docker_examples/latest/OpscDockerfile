@@ -15,9 +15,11 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     zlib1g \
     gzip \
     python \
-    python-support \
     ntp bash tree && \
     rm -rf /var/lib/apt/lists/*
+
+RUN wget http://launchpadlibrarian.net/109052632/python-support_1.0.15_all.deb
+RUN dpkg -i python-support_1.0.15_all.deb
 
 # OpsCenter tarball can be download into the folder where Dockerfile is
 # wget --user=$USER --password=$PASS http://downloads.datastax.com/enterprise/opscenter-6.0.0.tar.gz 
