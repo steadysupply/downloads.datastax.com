@@ -24,6 +24,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     gzip \
     python \
     sysstat \
+    sudo \
     ntp bash tree && \
     rm -rf /var/lib/apt/lists/*
 
@@ -35,24 +36,18 @@ RUN curl -o /bin/gosu -SkL "https://github.com/tianon/gosu/releases/download/1.4
     && chmod +x /bin/gosu
 
 
-# DSE tarball can be download into the folder where Dockerfile is
-# wget --user=$USER --password=$PASS http://downloads.datastax.com/enterprise/dse-5.0.0-bin.tar.gz
-# you may want to replace dse-5.0.0-bin.tar.gz with the corresponding downloaded package name. When
-# downloaded, please remove the version number part of the filename (or create a symlink), so the
-# resulting file is named dse-bin.tar.gz (that way the docker file itself remains version independent).
-#
-# DataStax Agent debian package can be downloaded from
-# wget --user=$USER --password=$PASS http://debian.datastax.com/enterprise/pool/datastax-agent_6.0.0_all.deb
-# you may want to replace the specific version with the corresponding downloaded package name. When
-# downloaded, please remove the version number part of the filename (or create a symlink), so the
-# resulting file is named datastax-agent_all.deb (that way the docker file itself remains version
-# independent).
-ADD dse-bin.tar.gz /opt
-ADD datastax-agent_all.deb /tmp
+ARG DSA_USER
+ARG DSA_PASS
+
+ARG DSE_VERSION=5.0.7
+ARG DSE_AGENT_VERSION=6.0.8
+
+RUN curl --user $DSA_USER:$DSA_PASS -L http://downloads.datastax.com/enterprise/dse-$DSE_VERSION-bin.tar.gz | tar xz
+RUN mv dse-$DSE_VERSION /opt/dse
+
+RUN curl --user $DSA_USER:$DSA_PASS http://debian.datastax.com/enterprise/pool/datastax-agent_${DSE_AGENT_VERSION}_all.deb > /tmp/datastax-agent_all.deb
 
 ENV DSE_HOME /opt/dse
-
-RUN ln -s /opt/dse* $DSE_HOME
 
 # keep data here
 VOLUME /data
