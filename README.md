@@ -32,48 +32,26 @@ Build the `dse-node-im` image
 docker build . --build-arg DSA_USER=$DSA_USER --build-arg DSA_PASS=$DSA_PASS -t dse-node-im
 ```
 Start a DSE node with `-k`, `-c` and `-t` flags to start Spark, DSEFS and the
-job tracker respectively.
+job tracker respectively. This command also mounts a `*.cql` file and `*.py`
+file for convenient execution within the cluster.
 > Note: starting another node will require a different container name to be
 > specified using`--name` flag
 ```
-docker run --link dse-opsc -e CLUSTER_NAME=dse-cluster -e STOMP_INTERFACE=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dse-opsc) --name dse-node-0 dse-node-im -k -c -t
+export MASTER_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dse-opsc)
+docker run --link dse-opsc -e CLUSTER_NAME=dse-cluster -e STOMP_INTERFACE=$MASTER_IP -v $(pwd)/origami-et3_sample_2017.cql:/opt/origami-et3_sample_2017.cql -v $(pwd)/poc.py:/opt/poc.py --name dse-node-0 dse-node-im -k -c -t
 ```
-Now DSE flavoured Hadoop-family commands are available, eg.
+Execute mounted `origami-et3_sample_2017.cql` file against Cassandra
+```
+docker exec dse-node-0 cqlsh -f /opt/origami-et3_sample_2017.cql`
+```
+Sumbit mounted PySpark job to Spak for processing
+```
+export SPARK_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dse-node-0)
+docker exec -e SPARK_IP=$SPARK_IP -it dse-node-0 dse spark-submit /opt/poc.py
+```
+Other DSE flavoured Hadoop-family commands are available, eg.
 ```
 docker exec -e HOME=/opt/dse -e IPYTHON=1 -it dse-node-0 dse pyspark
-```
-The full list
-```
-$ docker exec -it dse-node-0 dse
-
-/opt/dse/bin/dse:
-usage: dse [-f <config file> -u <username> -p <password> -a <jmx_username> -b <jmx_password>] <command> [command-args]
-
-Available commands:
-  -v                              print DSE version
-  cassandra                       run DSE server
-  cassandra-stop                  stop DSE server
-  fs                              run DSE File System shell
-  hadoop                          Hadoop command
-  hive                            Hive command
-  beeline                         Beeline command
-  pig                             Pig command
-  sqoop                           Sqoop command
-  mahout                          Mahout command
-  spark                           Spark shell
-  spark-class                     Spark class
-  spark-submit                    Submit Spark job
-  spark-jobserver                 Spark Jobserver command
-  spark-history-server            Spark History Server command
-  spark-sql-thriftserver          Spark SQL Thriftserver command
-  pyspark                         Spark Python shell
-  spark-sql                       Spark SQL command line
-  spark-beeline                   Beeline client from Spark
-  esri-import                     Esri import command
-  hive-metastore-migrate          Migrate Hive metastore from one DSE version to another
-  client-tool                     Runs a DSE client tool command
-  gremlin-console                 Runs Gremlin console
-  advrep                          Advanced Replication command
 ```
 If shell access to the container is required, it is recommended that the
 user logs in as `cassandra`:
