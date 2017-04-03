@@ -40,7 +40,7 @@ RUN curl -o /bin/gosu -SkL "https://github.com/tianon/gosu/releases/download/1.4
 ARG DSA_USER
 ARG DSA_PASS
 
-ARG DSE_VERSION=5.0.7
+ARG DSE_VERSION=5.0.5
 ARG DSE_AGENT_VERSION=6.0.8
 
 RUN curl --user $DSA_USER:$DSA_PASS -L http://downloads.datastax.com/enterprise/dse-$DSE_VERSION-bin.tar.gz | tar xz

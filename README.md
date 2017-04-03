@@ -38,7 +38,11 @@ job tracker respectively.
 ```
 docker run --link dse-opsc -e CLUSTER_NAME=dse-cluster -e STOMP_INTERFACE=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dse-opsc) --name dse-node-0 dse-node-im -k -c -t
 ```
-Now DSE flavoured Hadoop-family commands are available
+Now DSE flavoured Hadoop-family commands are available, eg.
+```
+docker exec -e HOME=/opt/dse -e IPYTHON=1 -it dse-node-0 dse pyspark
+```
+The full list
 ```
 $ docker exec -it dse-node-0 dse
 
