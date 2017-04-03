@@ -100,6 +100,7 @@ setup_node() {
   tweak_spark_config "$DSE_HOME/resources/spark/conf"
   tweak_agent_config
   chown -R cassandra:cassandra /data /logs /conf
+  chown -R cassandra:cassandra /opt/dse
   
   # mark that we tweaked configs
   touch "$DSE_HOME/tweaked_configs"
