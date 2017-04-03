@@ -23,6 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     zlib1g \
     gzip \
     python \
+    ipython \
     sysstat \
     sudo \
     ntp bash tree && \
@@ -65,6 +66,14 @@ RUN groupadd -g 1337 cassandra && \
 # install the agent
 RUN dpkg -i /tmp/datastax-agent_all.deb
 
+# add config file
+ADD  ./dse.yaml /opt/dse/resources/dse/conf/dse.yaml
+
+# set general permissions and fs lib dir
+RUN mkdir /var/lib/dsefs
+RUN chown -R cassandra:cassandra /opt/dse /var/lib/dsefs
+WORKDIR /opt/dse
+
 # starting node using custom entrypoint that configures paths, interfaces, etc.
 COPY scripts/dse-entrypoint /usr/local/bin/
 RUN chmod +x /usr/local/bin/dse-entrypoint
@@ -84,7 +93,7 @@ RUN for cmd in cqlsh dsetool nodetool dse cassandra-stress; do \
 # http://docs.datastax.com/en/datastax_enterprise/5.0/datastax_enterprise/sec/secConfFirePort.html
 
 # Cassandra
-EXPOSE 7000 9042 9160
+EXPOSE 7000 9042 9160 5598
 
 # Solr
 EXPOSE 8983 8984
@@ -97,5 +106,3 @@ EXPOSE 8012 50030 50060 9290
 
 # Hive/Shark
 EXPOSE 10000
-
-# Graph

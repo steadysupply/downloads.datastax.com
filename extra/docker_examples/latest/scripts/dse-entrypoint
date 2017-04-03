@@ -11,6 +11,7 @@ if [ -z ${IP} ]; then
   IP=`hostname --ip-address`
 fi
 
+echo This node’s IP address is $IP
 echo $IP > /data/ip.address
 
 # create directories for holding the node's data, logs, etc.
@@ -112,4 +113,3 @@ setup_node() {
 [ -f "/etc/init.d/datastax-agent" ] && /etc/init.d/datastax-agent start
 
 exec gosu cassandra "$DSE_HOME/bin/dse" cassandra -f "$@"
-
